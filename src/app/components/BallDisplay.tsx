@@ -1,4 +1,4 @@
-type Ball = number | "Out" | null;
+type Ball = number | string | null;
 
 export const getRunBgColor = (run: Ball) => {
   switch (run) {

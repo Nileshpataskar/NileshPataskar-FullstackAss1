@@ -5,7 +5,7 @@ import Header from "../../components/Header";
 import BallDisplay from "../../components/BallDisplay";
 
 // Update the Ball type to match BallDisplay
-type Ball = number | "Out" | null;
+type Ball = number | string | null;
 
 export default function Admin() {
   const [score, setScore] = useState({ runs: 0, wickets: 0, overs: 0 });
@@ -14,6 +14,7 @@ export default function Admin() {
   const [overHistory, setOverHistory] = useState<(number | "Out")[][]>([]);
 
   const addRun = (run: number | "Out") => {
+
     const updatedBalls = [...balls];
     updatedBalls[currentBall] = run;
     setBalls(updatedBalls);
@@ -45,6 +46,8 @@ export default function Admin() {
           currentBall={currentBall}
           overs={score.overs}
           overHistory={overHistory}
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          //@ts-expect-error
           addRun={(run) => addRun(run)}
         />
       </div>

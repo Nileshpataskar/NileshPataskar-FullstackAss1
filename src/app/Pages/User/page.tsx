@@ -1,5 +1,5 @@
-import BallDisplay from "@/app/components/BallDisplay";
-import Header from "@/app/components/Header";
+// import BallDisplay from "@/app/components/BallDisplay";
+// import Header from "@/app/components/Header";
 import React from "react";
 
 const page = () => {
