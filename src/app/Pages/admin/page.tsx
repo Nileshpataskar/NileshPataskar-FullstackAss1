@@ -33,8 +33,13 @@ export default function Admin() {
     setScore(newScore);
 
     if (currentBall === 5) {
-      // Add the current over to the history
-      setOverHistory([updatedBalls, ...overHistory]);
+      // Replace null values with 0 for finalized balls
+      const finalizedBalls = updatedBalls.map((ball) =>
+        ball === null ? 0 : ball
+      ) as (number | "Out")[];
+
+      // Add the finalized over to the history
+      setOverHistory([finalizedBalls, ...overHistory]);
 
       // Move to the next over
       setScore({ ...newScore, overs: score.overs + 1 });
