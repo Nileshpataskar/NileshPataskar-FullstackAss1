@@ -5,9 +5,7 @@ export const getRunBgColor = (run: Ball) => {
     case 0:
       return "bg-transparent";
     case 1:
-      return "bg-[#e6e6e6]";
     case 2:
-      return "bg-[#e6e6e6]";
     case 3:
       return "bg-[#e6e6e6]";
     case 4:
@@ -24,6 +22,7 @@ export const getRunBgColor = (run: Ball) => {
 export default function BallDisplay({
   balls,
   currentBall,
+  
   overs,
   overHistory,
   addRun,
@@ -34,26 +33,34 @@ export default function BallDisplay({
   overHistory: Ball[][];
   addRun: (run: Ball) => void;
 }) {
-  const getOverLabel = (index: number) => `${index + 1}`;
+  const getBallSuffix = (index: number) => {
+    if (index === 0) return "st";
+    if (index === 1) return "nd";
+    if (index === 2) return "rd";
+    return "th";
+  };
 
   return (
-    <div className="flex w-full flex-col items-end mb-4">
+    <div className="flex flex-col w-full items-end mb-4">
+      {/* Current Over Section */}
       <div className="text-md font-semibold mb-2 flex justify-start w-full">
-        This Over: {getOverLabel(overs)}
+        This Over: {overs}
       </div>
 
-      {/* Current Over */}
-      <div className="flex mb-4 border w-full justify-center gap-2">
+      <div className="flex mb-4 border p-4 pt-2 w-full justify-center gap-2">
         {balls.map((ball, index) => (
           <div
             key={index}
-            className={`w-10 h-10 flex items-center justify-center m-1 border rounded-full  ${
+            className={`relative w-10 h-10 flex items-center justify-center m-1 border rounded-full ${
               index === currentBall
-                ? "border-black animate-pulse"
+                ? "border-4 border-yellow-300 animate-pulse ease-in-out"
                 : "border-gray-800"
             } ${getRunBgColor(ball)}`}
           >
             {ball !== null ? ball : " "}
+            <div className="absolute bottom-[-20px] text-xs text-center w-full">
+              {`${index + 1}`}
+            </div>
           </div>
         ))}
       </div>
@@ -64,7 +71,7 @@ export default function BallDisplay({
           <button
             key={index}
             onClick={() => addRun(run as Ball)}
-            className={`px-4 w-10 h-10 py-2 m-1 rounded-full shadow flex justify-center items-center  ${getRunBgColor(
+            className={`px-4 w-10 h-10 py-2 m-1 rounded-full shadow flex justify-center items-center ${getRunBgColor(
               run as Ball
             )}`}
           >
@@ -73,26 +80,20 @@ export default function BallDisplay({
         ))}
       </div>
 
-      {/* Over Listings */}
-      <div className="w-full">
-        <p className="text-lg font-semibold mb-2 mt-6 items-start">
-          Over Listing
-        </p>
-      </div>
-      <div className="flex flex-col items-center w-full">
+      {/* Over Listings Section */}
+      <div className="w-full mt-6">
+        <p className="text-lg font-semibold mb-2">Over Listing</p>
         {overHistory.map((over, index) => (
           <div
             key={index}
-            className="flex items-center mb-2 w-full justify-center gap-2"
+            className="flex gap-10 justify-center  items-center mb-4 border p-4 w-full "
           >
-            <div className="flex flex-col">
-              <p className="text-md font-medium">{getOverLabel(index)}</p>
-            </div>
-            <div className="flex mb-1 mx-4 border p-2 w-full max-w-[300px] justify-between">
+            <div className="font-medium text-xl flex "> {index + 1}</div>
+            <div className="flex gap-2">
               {over.map((ball, ballIndex) => (
                 <div
                   key={ballIndex}
-                  className={`w-10 h-10 flex items-center justify-center gap-2 rounded-full ${getRunBgColor(
+                  className={`w-10 h-10 flex items-center justify-center rounded-full ${getRunBgColor(
                     ball
                   )}`}
                 >

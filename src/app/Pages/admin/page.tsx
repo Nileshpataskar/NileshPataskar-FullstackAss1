@@ -1,53 +1,123 @@
-'use client';
+"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../../components/Header";
 import BallDisplay from "../../components/BallDisplay";
+import axios from "axios";
 
-// Update the Ball type to match BallDisplay
-type Ball = number | string | null;
+type Ball = number | "Out" | null;
 
 export default function Admin() {
   const [score, setScore] = useState({ runs: 0, wickets: 0, overs: 0 });
-  const [balls, setBalls] = useState<Ball[]>([null, null, null, null, null, null]);
+  const [balls, setBalls] = useState<Ball[]>([
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  ]);
   const [currentBall, setCurrentBall] = useState(0);
-  const [overHistory, setOverHistory] = useState<(number | "Out")[][]>([]);
+  const [currentBallAPI, setCurrentBallAPI] = useState(0);
+  const [overHistory, setOverHistory] = useState<Ball[][]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const addRun = (run: number | "Out") => {
+  useEffect(() => {
+    async function fetchMatchData() {
+      try {
+        const res = await axios.get(
+          "https://cricket-backend-i91d.onrender.com/api/match"
+        );
+        const {
+          totalRuns,
+          totalWickets,
+          totalOvers,
+          currentOver,
+          currentBall,
+          overHistory,
+        } = res.data;
 
-    const updatedBalls = [...balls];
-    updatedBalls[currentBall] = run;
-    setBalls(updatedBalls);
+        // Update score
+        setScore({ runs: totalRuns, wickets: totalWickets, overs: totalOvers });
 
-    const newScore = {
-      ...score,
-      runs: score.runs + (run !== "Out" ? run : 0),
-      wickets: score.wickets + (run === "Out" ? 1 : 0),
-    };
-    setScore(newScore);
+        // Map currentOver to balls array
+        const mappedBalls = currentOver.map(
+          (ball: { runs: number; isOut: boolean }) =>
+            ball.isOut ? "Out" : ball.runs
+        );
 
-    if (currentBall === 5) {
-      const finalizedBalls = updatedBalls.map((ball) => (ball === null ? 0 : ball)) as (number | "Out")[];
-      setOverHistory([finalizedBalls, ...overHistory]);
-      setScore({ ...newScore, overs: score.overs + 1 });
-      setCurrentBall(0);
-      setBalls([null, null, null, null, null, null]);
-    } else {
-      setCurrentBall(currentBall + 1);
+        // Update balls and currentBall
+        setBalls([...mappedBalls, ...Array(6 - mappedBalls.length).fill(null)]);
+        setCurrentBall(mappedBalls.length);
+        setCurrentBallAPI(currentBall);
+
+        // Map overHistory to the required format
+        const mappedOverHistory = overHistory.map((over: any[]) =>
+          over.map((ball) => (ball.isOut ? "Out" : ball.runs))
+        );
+        setOverHistory(mappedOverHistory);
+      } catch (err) {
+        console.error("Error fetching match data:", err);
+      }
+    }
+
+    fetchMatchData();
+  }, []);
+
+  const addRun = async (run: Ball) => {
+    if (loading) return;
+
+    setLoading(true);
+
+    try {
+      // Update the backend with the new run
+      await axios.post("https://cricket-backend-i91d.onrender.com/api/match", {
+        runs: run !== "Out" ? run : 0,
+        isOut: run === "Out",
+      });
+
+      // Fetch the latest match data to sync frontend with backend
+      const res = await axios.get(
+        "https://cricket-backend-i91d.onrender.com/api/match"
+      );
+      const { totalRuns, totalWickets, totalOvers, currentOver, overHistory } =
+        res.data;
+
+      // Update score
+      setScore({ runs: totalRuns, wickets: totalWickets, overs: totalOvers });
+
+      // Update balls and currentBall
+      const mappedBalls = currentOver.map(
+        (ball: { runs: number; isOut: boolean }) =>
+          ball.isOut ? "Out" : ball.runs
+      );
+      setBalls([...mappedBalls, ...Array(6 - mappedBalls.length).fill(null)]);
+      setCurrentBall(mappedBalls.length);
+
+      // Update over history
+      const mappedOverHistory = overHistory.map((over: any[]) =>
+        over.map((ball) => (ball.isOut ? "Out" : ball.runs))
+      );
+      setOverHistory(mappedOverHistory);
+    } catch (err) {
+      console.error("Error posting run:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="w-full flex justify-center mt-10">
-      <div className="p-8 border-2 border-black w-[450px] ">
-        <Header score={score} currentBall={currentBall} />
+
+      <div className="p-8 border-2 border-black w-[450px]">
+
+        <h1 className="bg-green-50 w-full text-3xl flex justify-center mb-5 animate-pulse font-mono">Admin View</h1>
+        <Header score={score} />
         <BallDisplay
           balls={balls}
           currentBall={currentBall}
           overs={score.overs}
           overHistory={overHistory}
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //@ts-expect-error
           addRun={(run) => addRun(run)}
         />
       </div>
