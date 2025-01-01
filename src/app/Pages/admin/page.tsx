@@ -18,7 +18,8 @@ export default function Admin() {
     null,
   ]);
   const [currentBall, setCurrentBall] = useState(0);
-  const [currentBallAPI, setCurrentBallAPI] = useState(0);
+  const [
+    , setCurrentBallAPI] = useState(0);
   const [overHistory, setOverHistory] = useState<Ball[][]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -52,6 +53,7 @@ export default function Admin() {
         setCurrentBallAPI(currentBall);
 
         // Map overHistory to the required format
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mappedOverHistory = overHistory.map((over: any[]) =>
           over.map((ball) => (ball.isOut ? "Out" : ball.runs))
         );
@@ -94,7 +96,9 @@ export default function Admin() {
       setBalls([...mappedBalls, ...Array(6 - mappedBalls.length).fill(null)]);
       setCurrentBall(mappedBalls.length);
 
+      
       // Update over history
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mappedOverHistory = overHistory.map((over: any[]) =>
         over.map((ball) => (ball.isOut ? "Out" : ball.runs))
       );
@@ -118,6 +122,9 @@ export default function Admin() {
           currentBall={currentBall}
           overs={score.overs}
           overHistory={overHistory}
+
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          //@ts-expect-error
           addRun={(run) => addRun(run)}
         />
       </div>

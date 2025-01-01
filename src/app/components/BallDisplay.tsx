@@ -33,12 +33,14 @@ export default function BallDisplay({
   overHistory: Ball[][];
   addRun: (run: Ball) => void;
 }) {
-  const getBallSuffix = (index: number) => {
-    if (index === 0) return "st";
-    if (index === 1) return "nd";
-    if (index === 2) return "rd";
-    return "th";
-  };
+
+
+  // const getBallSuffix = (index: number) => {
+  //   if (index === 0) return "st";
+  //   if (index === 1) return "nd";
+  //   if (index === 2) return "rd";
+  //   return "th";
+  // };
 
   return (
     <div className="flex flex-col w-full items-end mb-4">

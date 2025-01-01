@@ -4,9 +4,10 @@ import { getRunBgColor } from "@/app/components/BallDisplay";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-const UserPage = () => {
-  const [data, setData] = useState([]);
+// Define Ball type
+type Ball = number | "Out" | null;
 
+const UserPage = () => {
   const [score, setScore] = useState({ runs: 0, wickets: 0, overs: 0 });
   const [balls, setBalls] = useState<Ball[]>([
     null,
@@ -19,7 +20,7 @@ const UserPage = () => {
   const [currentBall, setCurrentBall] = useState(0);
   const [currentBallAPI, setCurrentBallAPI] = useState(0);
   const [overHistory, setOverHistory] = useState<Ball[][]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   useEffect(() => {
     fetchMatchData();
@@ -55,13 +56,14 @@ const UserPage = () => {
       setCurrentBallAPI(currentBall);
 
       // Map overHistory to the required format
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const mappedOverHistory = overHistory.map((over: any[]) =>
         over.map((ball) => (ball.isOut ? "Out" : ball.runs))
       );
       setOverHistory(mappedOverHistory);
     } catch (err) {
       console.error("Error fetching match data:", err);
-    }finally{
+    } finally {
       setLoading(false);
     }
   }
@@ -69,7 +71,9 @@ const UserPage = () => {
   return (
     <div className="flex justify-center mt-10 ">
       <div className="p-8 border-2 border-black w-[450px]">
-      <h1 className="bg-green-50 w-full text-3xl flex justify-center mb-5 animate-pulse font-mono">User View</h1>
+        <h1 className="bg-green-50 w-full text-3xl flex justify-center mb-5 animate-pulse font-mono">
+          User View
+        </h1>
 
         {/* header */}
         <div className="text-center mb-4">
@@ -80,7 +84,6 @@ const UserPage = () => {
         </div>
 
         {/* Overs */}
-
         <div className="flex mb-4 border p-4 pt-2 w-full justify-center gap-2">
           {balls.map((ball, index) => (
             <div
@@ -105,7 +108,7 @@ const UserPage = () => {
           {overHistory.map((over, index) => (
             <div
               key={index}
-              className="flex gap-10 justify-center  items-center mb-4 border p-4 w-full "
+              className="flex gap-10 justify-center items-center mb-4 border p-4 w-full "
             >
               <div className="font-medium text-xl flex "> {index + 1}</div>
               <div className="flex gap-2">
@@ -124,7 +127,6 @@ const UserPage = () => {
           ))}
         </div>
       </div>
-
     </div>
   );
 };
